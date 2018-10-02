@@ -7,6 +7,9 @@ if (typeof(Number.prototype.toRadians) === "undefined") {
 }
 
 const roundDuration = 60;
+
+const hintsAt = [30];
+
 class Game {
 
     constructor(io){
@@ -106,6 +109,8 @@ class Game {
 
         if(winner){
             winner.points++;
+            console.log('winner distance', winner.distance);
+            console.log('winner points', winner.points);
         }
 
 
@@ -119,6 +124,10 @@ class Game {
             if(winner && winner.points >= 5){
                 game.stopGame(winner);
             }
+        });
+
+        this.clients.forEach(function(client, index){
+           console.log(index, client.points)
         });
 
         setTimeout(function(){
@@ -151,7 +160,9 @@ class Game {
 
         socket.distance = distance;
 
-        console.log('distance', distance);
+        this.clients.forEach(function(client, index){
+            console.log('distance', index, client.distance);
+        });
 
         socket.emit('round.distance', {distance: distance});
 
@@ -206,11 +217,26 @@ class Game {
         this.secsRemaining--;
         this.emit('round.tick', {secsRemaining: this.secsRemaining});
 
+        if(hintsAt.indexOf(this.secsRemaining) >= 0){
+            this.hint();
+        }
+
         if(this.secsRemaining <= 0){
             this.stopRound();
 
         }else{
         }
+    }
+
+    hint(){
+        var goodCount = 0;
+        this.clients.forEach(function(client, index){
+            if(client.distance < radius){
+                goodCount++;
+            }
+        });
+
+        this.emit('hint', {hint: 'Clients within radius: ' + goodCount});
     }
 
     emit(event, args){

@@ -56,6 +56,17 @@
           $('#endGame').show();
       });
 
+      socket.on('hint', function(event, data){
+        var $msg = $('<div/>');
+        $msg.html(hint);
+
+        $('#hints').append($msg);
+
+        setTimeout(function(){
+            $msg.remove();
+        }, 5000);
+      });
+
 
       $(document).on('round.start', function(evt, roundData){
           $('#roundEnd').fadeOut(500);
@@ -87,6 +98,10 @@
     <div id='timer'></div>
     <div id='points'>0</div>
     <div id='pano'></div>
+
+    <div id="hints">
+
+    </div>
 
   </div>
 </body>
